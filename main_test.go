@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMainHandlerWhenOk(t *testing.T) {
@@ -15,10 +16,9 @@ func TestMainHandlerWhenOk(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
+	status := responseRecorder.Code
 
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Fatalf("expected status code: %d, got %d", http.StatusOK, status)
-	}
+	require.Equalf(t, status, http.StatusOK, "expected status code: %d, got %d", http.StatusOK, status)
 	body := responseRecorder.Body.String()
 	assert.NotEmpty(t, body)
 }
@@ -30,14 +30,11 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
+	status := responseRecorder.Code
 
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Fatalf("expected status code: %d, got %d", http.StatusOK, status)
-	}
-
+	require.Equalf(t, status, http.StatusOK, "expected status code: %d, got %d", http.StatusOK, status)
 	body := responseRecorder.Body.String()
 	assert.NotEmpty(t, body)
-
 	list := strings.Split(body, ",")
 	assert.Len(t, list, totalCount)
 }
@@ -48,10 +45,9 @@ func TestMainHandlerWhenCityNotSupported(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
+	status := responseRecorder.Code
 
-	if status := responseRecorder.Code; status != http.StatusBadRequest {
-		t.Fatalf("expected status code: %d, got %d", http.StatusBadRequest, status)
-	}
+	require.Equalf(t, status, http.StatusBadRequest, "expected status code: %d, got %d", http.StatusBadRequest, status)
 	body := responseRecorder.Body.String()
 	assert.Equal(t, body, "wrong city value")
 }
